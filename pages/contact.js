@@ -15,6 +15,14 @@ export default function Contact() {
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
     const [showFailureMessage, setShowFailureMessage] = useState(false);
 
+    const [wrongEmail, setWrongEmail] = useState(false);
+
+    const checkEmail = (email) => {
+        let regex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+
+        return regex.test(email);
+    }
+
     // Validation check method
     const handleValidation = () => {
         let tempErrors = {};
@@ -24,7 +32,7 @@ export default function Contact() {
             tempErrors["fullname"] = true;
             isValid = false;
         }
-        if (email.length === 0) {
+        if (email.length === 0 && email.checkEmail(email)) {
             tempErrors["email"] = true;
             isValid = false;
         }
@@ -44,19 +52,20 @@ export default function Contact() {
 
         let isValidForm = handleValidation();
 
-        if (isValidForm) {
-            setButtonText("Sending")
+        if (isValidForm && checkEmail(email)) {
             setShowSuccessMessage(true);
             setShowFailureMessage(false);
-            setButtonText("Send");
+            setFullname("");
+            setEmail("");
+            setMessage("");
+        } else if (!checkEmail(email)) {
+            setWrongEmail(true);
+            setShowSuccessMessage(false);
+            setShowFailureMessage(false);
         } else {
             setShowSuccessMessage(false);
             setShowFailureMessage(true);
         }
-        // Reset form fields
-        setFullname("");
-        setEmail("");
-        setMessage("");
         console.log(fullname, email, message);
     };
     return (
@@ -121,6 +130,13 @@ export default function Contact() {
                                 Oops! Something went wrong, please try again.
                             </p>
                         )}
+                        {
+                            wrongEmail && (
+                                <p className="text-red-500 text-lg">
+                                    Oops! Enter a Valid Email please.
+                                </p>
+                            )
+                        }
                     </div>
                 </form>
             </div>
